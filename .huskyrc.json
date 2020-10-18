@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "pre-commit": "npm run lint",
+    "post-merge": "post-npm-install",
+    "post-rebase": "post-npm-install"
+  }
+}
