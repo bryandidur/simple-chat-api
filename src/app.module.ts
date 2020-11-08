@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import config from './app.config';
 import { DatabaseModule } from './shared/modules/database/database.module';
 import { UserModule } from './user/user.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { UserModule } from './user/user.module';
     }),
     DatabaseModule,
     UserModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
