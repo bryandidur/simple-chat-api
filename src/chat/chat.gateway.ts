@@ -1,3 +1,4 @@
+import { InjectModel } from '@nestjs/mongoose';
 import {
   WebSocketGateway,
   SubscribeMessage,
@@ -7,22 +8,33 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
+import { Model } from 'mongoose';
 import { Server, Socket } from 'socket.io';
+import { Message, MessageDocument } from './message.schema';
 
 @WebSocketGateway()
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  public constructor(@InjectModel(Message.name) private readonly messageModel: Model<MessageDocument>) {}
+
   @WebSocketServer()
   private server: Server;
 
   private sockets: {[userName: string]: Socket} = {};
 
   @SubscribeMessage('chat/send-message')
-  public handleEvent(
+  public async handleEvent(
     @MessageBody() data: {toUser: string; text: string},
     @ConnectedSocket() socket: Socket,
-  ) {
+  ): Promise<void> {
     const authUserName = this.getAuthUserNameFromSocket(socket);
     const toUserSocket = this.sockets[data.toUser];
+
+    await this.messageModel.create({
+      threadKey: `${authUserName}/${data.toUser}`,
+      fromUser: authUserName,
+      toUser: data.toUser,
+      text: data.text,
+    });
 
     if (toUserSocket) {
       console.log(`Sending message from user (${authUserName}) to user (${data.toUser})`);
@@ -52,6 +64,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   private getAuthUserNameFromSocket(socket: Socket): string {
-    return socket.handshake.query.userName;
+    return socket.handshake.query.authUserName;
   }
 }

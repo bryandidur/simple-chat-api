@@ -1,9 +1,8 @@
 {
-  "name": "api",
+  "name": "simple-chat-api",
+  "version": "0.1.0",
+  "author": "Bryan Didur",
   "private": true,
-  "version": "0.0.1",
-  "description": "ADK People API",
-  "license": "Proprietary",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
